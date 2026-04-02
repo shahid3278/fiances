@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ledger — Finance Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style (2).css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <span class="brand-icon">◈</span>
+        <span class="brand-name">Ledger</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-page="dashboard">
+          <span class="nav-icon">▣</span> Overview
+        </a>
+        <a href="#" class="nav-item" data-page="transactions">
+          <span class="nav-icon">⇄</span> Transactions
+        </a>
+        <a href="#" class="nav-item" data-page="insights">
+          <span class="nav-icon">◎</span> Insights
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="role-switcher">
+          <div class="role-label">Role</div>
+          <select id="roleSelect" class="role-select">
+            <option value="viewer">👁 Viewer</option>
+            <option value="admin">⚡ Admin</option>
+          </select>
+        </div>
+        <div class="theme-toggle" id="themeToggle">
+          <span class="theme-icon">◑</span>
+          <span class="theme-label">Toggle Theme</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+      <button class="menu-toggle" id="menuToggle">☰</button>
+      <span class="brand-name-mobile">◈ Ledger</span>
+      <select id="roleSelectMobile" class="role-select-mobile">
+        <option value="viewer">👁</option>
+        <option value="admin">⚡</option>
+      </select>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+
+      <!-- DASHBOARD PAGE -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Good morning<span class="accent">.</span></h1>
+            <p class="page-subtitle">Here's your financial snapshot</p>
+          </div>
+          <div class="header-date" id="headerDate"></div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="cards-grid">
+          <div class="card card--balance">
+            <div class="card-label">Total Balance</div>
+            <div class="card-value" id="totalBalance">—</div>
+            <div class="card-trend" id="balanceTrend"></div>
+          </div>
+          <div class="card card--income">
+            <div class="card-label">Monthly Income</div>
+            <div class="card-value" id="totalIncome">—</div>
+            <div class="card-badge income-badge">↑ This month</div>
+          </div>
+          <div class="card card--expense">
+            <div class="card-label">Monthly Expenses</div>
+            <div class="card-value" id="totalExpenses">—</div>
+            <div class="card-badge expense-badge">↓ This month</div>
+          </div>
+          <div class="card card--savings">
+            <div class="card-label">Savings Rate</div>
+            <div class="card-value" id="savingsRate">—</div>
+            <div class="savings-bar-wrap"><div class="savings-bar" id="savingsBar"></div></div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="charts-row">
+          <div class="chart-panel chart-panel--wide">
+            <div class="panel-header">
+              <span class="panel-title">Balance Trend</span>
+              <div class="chart-legend">
+                <span class="legend-dot" style="background:var(--accent)"></span> Balance
+              </div>
+            </div>
+            <canvas id="trendChart" height="160"></canvas>
+          </div>
+          <div class="chart-panel">
+            <div class="panel-header">
+              <span class="panel-title">Spending by Category</span>
+            </div>
+            <canvas id="donutChart" height="180"></canvas>
+            <div class="donut-legend" id="donutLegend"></div>
+          </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Recent Transactions</span>
+            <a href="#" class="panel-link" data-page="transactions">View all →</a>
+          </div>
+          <div id="recentList" class="txn-list"></div>
+        </div>
+      </div>
+
+      <!-- TRANSACTIONS PAGE -->
+      <div class="page" id="page-transactions">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Transactions<span class="accent">.</span></h1>
+            <p class="page-subtitle">All your financial activity</p>
+          </div>
+          <button class="btn-primary admin-only hidden" id="addTxnBtn">+ Add Transaction</button>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-bar">
+          <input type="text" id="searchInput" class="filter-input" placeholder="Search transactions…" />
+          <select id="filterType" class="filter-select">
+            <option value="">All Types</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+          <select id="filterCategory" class="filter-select">
+            <option value="">All Categories</option>
+          </select>
+          <select id="sortSelect" class="filter-select">
+            <option value="date-desc">Newest First</option>
+            <option value="date-asc">Oldest First</option>
+            <option value="amount-desc">Highest Amount</option>
+            <option value="amount-asc">Lowest Amount</option>
+          </select>
+          <button class="btn-ghost" id="exportBtn">↓ Export</button>
+        </div>
+
+        <div id="txnList" class="txn-list txn-list--full"></div>
+        <div id="txnEmpty" class="empty-state hidden">
+          <div class="empty-icon">◎</div>
+          <div>No transactions found</div>
+        </div>
+      </div>
+
+      <!-- INSIGHTS PAGE -->
+      <div class="page" id="page-insights">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Insights<span class="accent">.</span></h1>
+            <p class="page-subtitle">Understand your patterns</p>
+          </div>
+        </div>
+
+        <div class="insights-grid">
+          <div class="insight-card insight-card--highlight">
+            <div class="insight-label">Top Spending Category</div>
+            <div class="insight-value" id="topCategory">—</div>
+            <div class="insight-sub" id="topCategoryAmt"></div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-label">Avg. Daily Spend</div>
+            <div class="insight-value" id="avgDailySpend">—</div>
+            <div class="insight-sub">this month</div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-label">Largest Expense</div>
+            <div class="insight-value" id="largestExpense">—</div>
+            <div class="insight-sub" id="largestExpenseNote"></div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-label">Income vs Expense Ratio</div>
+            <div class="insight-value" id="incomeExpenseRatio">—</div>
+            <div class="insight-sub">income to expense</div>
+          </div>
+        </div>
+
+        <!-- Monthly Comparison -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Monthly Comparison</span>
+          </div>
+          <canvas id="barChart" height="180"></canvas>
+        </div>
+
+        <!-- Category Breakdown -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Category Breakdown</span>
+          </div>
+          <div id="categoryBreakdown" class="category-breakdown"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add/Edit Transaction Modal -->
+  <div class="modal-overlay hidden" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="modalTitle">Add Transaction</span>
+        <button class="modal-close" id="modalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <input type="text" id="txnDesc" class="form-input" placeholder="e.g. Grocery Shopping" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Amount (₹)</label>
+            <input type="number" id="txnAmount" class="form-input" placeholder="0.00" min="0" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Type</label>
+            <select id="txnType" class="form-input">
+              <option value="expense">Expense</option>
+              <option value="income">Income</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select id="txnCategory" class="form-input">
+              <option>Food & Dining</option>
+              <option>Housing</option>
+              <option>Transport</option>
+              <option>Entertainment</option>
+              <option>Healthcare</option>
+              <option>Shopping</option>
+              <option>Utilities</option>
+              <option>Salary</option>
+              <option>Freelance</option>
+              <option>Investment</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" id="txnDate" class="form-input" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-ghost" id="modalCancel">Cancel</button>
+          <button class="btn-primary" id="modalSave">Save Transaction</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
